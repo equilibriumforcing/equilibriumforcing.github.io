@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Equilibrium Forcing: Adaptive Video Generation Without Noise Conditioning">
+  <!-- <meta name="keywords" content="Generative Models, Video Generation"> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Equilibrium Forcing</title>
+  
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.png">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <script>
+    function setExpanded(el, isOpen) {
+      el.setAttribute('aria-expanded', String(isOpen));
+    }
+  
+    // Event delegation: one listener handles all current and future toggles
+    document.addEventListener('click', function (e) {
+      const header = e.target.closest('.toggle-header');
+      if (!header) return;
+  
+      const container = header.closest('.toggle-container');
+      const willOpen = !container.classList.contains('open');
+      container.classList.toggle('open', willOpen);
+      setExpanded(header, willOpen);
+  
+      // Optional: pause videos when collapsing; resume when expanding
+      const vids = container.querySelectorAll('video');
+      vids.forEach(v => {
+        if (willOpen) {
+          // Try resuming if it was playing before
+          if (v.autoplay && v.paused) v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      });
+    });
+  
+    // Keyboard accessibility (Enter/Space on header)
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const header = document.activeElement.closest?.('.toggle-header');
+      if (!header) return;
+      e.preventDefault();
+      header.click();
+    });
+  
+    // Initialize aria-expanded based on initial state (.open or not)
+    document.querySelectorAll('.toggle-header').forEach(h => {
+      const isOpen = h.closest('.toggle-container')?.classList.contains('open');
+      setExpanded(h, !!isOpen);
+    });
+  </script>
+
+
+  <!-- Style for toggle-able buttons-->
+  <style>
+    .toggle-container {
+      width: 100%;
+      text-align: center;
+      margin-top: 20px;
+    }
+  
+    .toggle-header {
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+  
+    .toggle-header .arrow {
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+  
+    /* Hidden by default */
+    .toggle-content {
+      display: none;
+      margin-top: 12px;
+    }
+  
+    /* Shown when container is open */
+    .toggle-container.open .toggle-content {
+      display: block;
+    }
+  
+    /* Rotate arrow when open */
+    .toggle-container.open .toggle-header .arrow {
+      transform: rotate(90deg);
+    }
+  </style>
+
+
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="https://hansenlillemark.com">
+        <span class="icon">
+            <i class="fas fa-home"></i>
+        </span>
+      </a>
+
+    </div>
+
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-2 publication-title">Equilibrium Forcing: Adaptive Video Generation Without Noise Conditioning</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://hansenlillemark.com">Hansen Jin Lillemark</a><sup>* 1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://a5rojas.github.io/">Alex Rojas</a><sup>* 1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://zacharynovack.github.io/">Zachary Novack</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://raywang4.github.io/">Runqian Wang</a><sup>2</sup>,
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://yilundu.github.io/">Yilun Du</a><sup>3</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://sites.google.com/view/yianma/home">Yian Ma</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://cseweb.ucsd.edu/~tberg/">Taylor Berg-Kirkpatrick</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://roseyu.com/">Rose Yu</a><sup>1</sup>,
+            </span>
+          </div>
+
+
+          <div class="is-size-6 publication-authors">
+            <span class="author-block"><sup>*</sup>Equal Contribution</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <img
+                src="./static/images/ucsd.jpg"
+                alt="UCSD logo"
+                class="affil-logo"
+              />
+              <sup>1</sup>
+              UC San Diego
+            </span>
+
+            <span class="author-block">
+              <img
+                src="./static/images/mit.png"
+                alt="MIT logo"
+                class="affil-logo-small"
+              />
+              <sup>2</sup>
+              Massachusetts Institute of Technology
+            </span>
+
+            <span class="author-block">
+              <img
+                src="./static/images/harvard.jpg"
+                alt="Harvard logo"
+                class="affil-logo"
+              />
+              <sup>3</sup>
+              Harvard University;
+            </span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <!-- TODO: Insert pdf link here -->
+              <span class="link-block">
+                <a href="TODO" target="_blank" 
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- TODO: Insert abs link here -->
+              <span class="link-block">
+                <a href="TODO" target="_blank" 
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Video Link. -->
+              <!-- <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span> -->
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="TODO" target="_blank" 
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+
+      <br>
+
+      <h2 class="subtitle has-text-centered">
+        Equilibrium Forcing trains video denoising models without noise level conditioning on a simple transport objective, 
+        achieving improved video generation through data-adaptive sampling and unifying the theory and practice of noise-unconditional denoising models.
+      </h2>
+
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Standard autoregressive video generation algorithms based on Diffusion and Flow Matching rely on 
+            rigid training objectives and static sampling schedules, limiting inference procedures from 
+            adapting to the data. 
+          </p>
+          <p>
+            We introduce Equilibrium Forcing (EqF), a simplified objective for video denoising generative 
+            models without noise level conditioning. EqF turns inference into a gradient-based optimization 
+            problem with modular training- and inference-time designs that decouple learning the denoising 
+            field from sampling. 
+          </p>
+          <p>
+            By adapting the structure of the gradient flow during sampling to propose data-dependent step 
+            sizes, EqF improves video quality and consistency on challenging autoregressive video generation 
+            benchmarks. Extensive analysis elucidates exactly how removing the noise level conditioning 
+            enables EqF's data-dependent inference properties to surpass the performance of standard noise 
+            level-conditional denoising video methods.
+          </p>
+        </div>
+        <br>
+        
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<hr class="section-divider">
+
+
+<!-- <section class="section" id="model-3d">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3"></h2>
+
+        
+        <h3 class="title is-4"></h3>
+        <div class="content has-text-justified">
+          <p>
+        
+          </p>
+        </div>
+
+        <div class="col-auto">
+          <br>
+        <div style="text-align: center;"><img src='./static/images/comparison.png' style="max-width: 100%; height: auto;" width="900" alt='missing' /></div>
+        </div>
+
+        <br>
+        
+        <h3 class="title is-4"></h3>
+        <div class="content has-text-justified">
+          <p>
+          </p>
+        </div>
+
+        <div class="col-auto">
+          <br>
+        <div style="text-align: center;"><img src='./static/images/model.png' style="max-width: 80%; height: auto;" width="900" alt='missing' /></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section> -->
+
+
+<hr class="section-divider">
+
+
+<section class="section" id="results-3d-blockworld">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Minecraft Results</h2>
+
+        <div class="content has-text-justified">
+          <p>
+              For better visualization, we provide example videos of full rollouts on the Minecraft dataset. We compare between 
+              Equilibrium Forcing (EqF), baseline Equilibrium Matching (EqM), and baseline Flow Matching (FM). Each rollout follows 
+              a set of action conditions either turning left, turning right, or going straight. Rollouts are conditioned on 25 
+              frames of history, and generate 275 frames into the future with a model self-attention window size of 50. 
+          </p>
+        </div>
+
+        <!-- Model comparison. -->
+
+        <div style="text-align: center; margin-top: 28px">
+          <figure style="text-align:center;">
+            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+              Minecraft Rollout #1
+            </figcaption>
+            <video
+              controls
+              autoplay
+              muted
+              loop
+              width="750"
+              style="max-width:100%; height:auto;"
+              src="./static/videos/minecraft/minecraft_1.mp4"
+            ></video>
+          </figure>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            Minecraft Rollout #2
+          </div>
+
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+                  
+                </figcaption>
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="750"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/minecraft/minecraft_2.mp4"
+                ></video>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            Minecraft Rollout #3
+          </div>
+
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+                  
+                </figcaption>
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="750"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/minecraft/minecraft_3.mp4"
+                ></video>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+      <div class="toggle-container">
+        <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+          <span class="arrow">▶</span>
+          Minecraft Rollout #4
+        </div>
+
+        <div class="toggle-content">
+          <div style="text-align: center; margin-top: 28px">
+            <figure style="text-align:center;">
+              <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+                
+              </figcaption>
+              <video
+                controls
+                autoplay
+                muted
+                loop
+                width="750"
+                style="max-width:100%; height:auto;"
+                src="./static/videos/minecraft/minecraft_4.mp4"
+              ></video>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+    <div class="toggle-container">
+      <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+        <span class="arrow">▶</span>
+        Minecraft Rollout #5
+      </div>
+
+      <div class="toggle-content">
+        <div style="text-align: center; margin-top: 28px">
+          <figure style="text-align:center;">
+            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+              
+            </figcaption>
+            <video
+              controls
+              autoplay
+              muted
+              loop
+              width="750"
+              style="max-width:100%; height:auto;"
+              src="./static/videos/minecraft/minecraft_5.mp4"
+            ></video>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+</section>
+
+
+
+<hr class="section-divider">
+
+
+
+<section class="section" id="results-3d-blockworld">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">RealEstate10K Results</h2>
+
+        <div class="content has-text-justified">
+          <p>
+              We also provide example videos of full rollouts on the RealEstate10K dataset. We compare between the finetuned EqF-FT 
+              and FM-FT models, finetuned from the pretrained Wan 2.1 Text to video 1.3B parameter video generation model. Each rollout
+              follows camera conditions to describe the movement of the camera throughout the trajectory. Rollouts are conditioned on 37
+              frames of history, and generate 152 frames into the future with a model self-attention window size of 49. 
+          </p>
+        </div>
+
+        <!-- Model comparison. -->
+
+        <div style="text-align: center; margin-top: 28px">
+          <figure style="text-align:center;">
+            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+              Re10K Rollout #1
+            </figcaption>
+            <video
+              controls
+              autoplay
+              muted
+              loop
+              width="600"
+              style="max-width:100%; height:auto;"
+              src="./static/videos/re10k/re10k_1.mp4"
+            ></video>
+          </figure>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            Re10K Rollout #2
+          </div>
+
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+                  
+                </figcaption>
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="600"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/re10k/re10k_2.mp4"
+                ></video>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            Re10K Rollout #3
+          </div>
+
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+                  
+                </figcaption>
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="600"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/re10k/re10k_3.mp4"
+                ></video>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+      <div class="toggle-container">
+        <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+          <span class="arrow">▶</span>
+          Re10K Rollout #4
+        </div>
+
+        <div class="toggle-content">
+          <div style="text-align: center; margin-top: 28px">
+            <figure style="text-align:center;">
+              <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+                
+              </figcaption>
+              <video
+                controls
+                autoplay
+                muted
+                loop
+                width="600"
+                style="max-width:100%; height:auto;"
+                src="./static/videos/re10k/re10k_4.mp4"
+              ></video>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+    <div class="toggle-container">
+      <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+        <span class="arrow">▶</span>
+        Re10K Rollout #5
+      </div>
+
+      <div class="toggle-content">
+        <div style="text-align: center; margin-top: 28px">
+          <figure style="text-align:center;">
+            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+              
+            </figcaption>
+            <video
+              controls
+              autoplay
+              muted
+              loop
+              width="600"
+              style="max-width:100%; height:auto;"
+              src="./static/videos/re10k/re10k_5.mp4"
+            ></video>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+</section>
+
+
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>TODO</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link"
+         href="TODO" target="_blank" class="external-link">
+         <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="TODO" target="_blank" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is based on the <a href="https://github.com/nerfies/nerfies.github.io">open source website code</a> from the Nerfies website.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+</body>
+</html>
