@@ -1,5 +1,49 @@
 body {
   font-family: 'Noto Sans', sans-serif;
+  background:
+    linear-gradient(180deg, rgba(31, 78, 121, 0.18) 0%, rgba(255, 255, 255, 0.96) 360px, #fff 520px);
+  background-color: #fff;
+  background-repeat: no-repeat;
+}
+
+.container.is-max-desktop {
+  max-width: 800px !important;
+}
+
+.content {
+  /* line-height: 1.55; */
+  line-height: 1.35;
+  color: #292929;
+}
+
+.content p:not(:last-child) {
+  margin-bottom: 0.75em;
+}
+
+.title {
+  line-height: 1.15;
+}
+
+.subtitle {
+  line-height: 1.35;
+  color: #292929;
+}
+
+.navbar {
+  background: transparent;
+}
+
+.more-research-link {
+  border-radius: 999px;
+  color: #1f4e79;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.more-research-link:hover,
+.more-research-link:focus {
+  background-color: rgba(31, 78, 121, 0.12);
+  color: #153756;
+  transform: translateY(-1px);
 }
 
 
@@ -33,14 +77,23 @@ body {
   margin-left: 0.2em;  /* space between logo and text */
 }
 
+.affil-logo-spaced {
+  margin-left: 0.8em;
+}
+
 
 .teaser .hero-body {
   padding-top: 0;
-  padding-bottom: 3rem;
+  padding-bottom: 1rem;
 }
 
 .teaser {
   font-family: 'Google Sans', sans-serif;
+}
+
+.section {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 
@@ -87,7 +140,8 @@ body {
 }
 
 .publication-authors a {
-   color: hsl(204, 86%, 53%) !important;
+   color: #1f4e79 !important;
+   font-weight: 600;
 }
 
 .publication-authors a:hover {
