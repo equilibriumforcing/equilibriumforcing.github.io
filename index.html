@@ -267,7 +267,7 @@
 </nav>
 
 
-<section class="hero">
+<section class="hero publication-hero">
   <div class="hero-body pt-5">
     <div class="container is-max-desktop">
       <div class="columns is-centered">
@@ -333,7 +333,7 @@
               <img
                 src="./static/images/harvard.jpg"
                 alt="Harvard logo"
-                class="affil-logo affil-logo-spaced"
+                class="affil-logo-medium affil-logo-spaced"
               />
               <sup>3</sup>
               Harvard University
@@ -345,7 +345,7 @@
               <!-- PDF Link. -->
               <!-- TODO: Insert pdf link here -->
               <span class="link-block">
-                <a href="TODO" target="_blank" 
+                <a href="static/pdf/eqf.pdf" target="_blank" 
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fas fa-file-pdf"></i>
@@ -355,7 +355,7 @@
               </span>
               <!-- TODO: Insert abs link here -->
               <span class="link-block">
-                <a href="TODO" target="_blank" 
+                <a href="#" target="_blank" 
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="ai ai-arxiv"></i>
@@ -375,12 +375,12 @@
               </span> -->
               <!-- Code Link. -->
               <span class="link-block">
-                <a href="TODO" target="_blank" 
+                <a href="#" target="_blank" 
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fab fa-github"></i>
                   </span>
-                  <span>Code</span>
+                  <span>Code (available on request)</span>
                   </a>
               </span>
             </div>
@@ -398,13 +398,28 @@
   <div class="container is-max-desktop">
     <div class="hero-body">
 
-      <br>
-
       <h2 class="subtitle has-text-centered">
-        Equilibrium Forcing trains video denoising models without noise level conditioning on a simple transport objective, 
-        achieving improved video generation through data-adaptive sampling and unifying the theory and practice of noise-unconditional denoising models.
+        Equilibrium Forcing (EqF) is a framework for video denoising generative models without noise level conditioning. 
+        EqF improves video generation quality and sampling speed through adaptive sampling, unifying and simplifying the theory and practice
+        of noise-unconditional denoising models.
       </h2>
 
+    </div>
+  </div>
+</section>
+
+
+<section class="section release-video-section">
+  <div class="container is-max-desktop">
+    <div class="has-text-centered">
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        width="900"
+        style="max-width:100%; height:auto;"
+        src="./static/videos/eqf_release_video.mp4"
+      ></video>
     </div>
   </div>
 </section>
@@ -419,21 +434,18 @@
         <div class="content has-text-justified">
           <p>
             Standard autoregressive video generation algorithms based on Diffusion and Flow Matching rely on 
-            rigid training objectives and static sampling schedules, limiting inference procedures from 
-            adapting to the data. 
+            rigid training objectives and static sampling schedules, limiting inference procedures from adapting to the data. 
           </p>
           <p>
-            We introduce Equilibrium Forcing (EqF), a simplified objective for video denoising generative 
-            models without noise level conditioning. EqF turns inference into a gradient-based optimization 
-            problem with modular training- and inference-time designs that decouple learning the denoising 
-            field from sampling. 
+            We introduce Equilibrium Forcing (\EqF), a simplified framework for video denoising generative models without noise level conditioning. 
+            \EqF pioneers modular training- and inference-time designs for noise-unconditional generation that decouple learning the 
+            denoising field from sampling. 
           </p>
           <p>
-            By adapting the structure of the gradient flow during sampling to propose data-dependent step 
-            sizes, EqF improves video quality and consistency on challenging autoregressive video generation 
-            benchmarks. Extensive analysis elucidates exactly how removing the noise level conditioning 
-            enables EqF's data-dependent inference properties to surpass the performance of standard noise 
-            level-conditional denoising video methods.
+            This flexibility allows for inference-time algorithms that operate in a closed loop by adapting to feedback from the sample, 
+            improving video quality and consistency on challenging autoregressive video generation benchmarks. 
+            Extensive analysis elucidates exactly how removing the noise level conditioning enables \EqF's data-dependent inference properties 
+            to surpass the performance of standard noise level-conditional denoising video methods.
           </p>
         </div>
         <br>
@@ -780,6 +792,146 @@
 </section>
 
 
+<hr class="section-divider">
+
+
+<section class="section" id="results-droid">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">DROID Results</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            We also provide example videos of full rollouts on the DROID dataset.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 28px">
+          <figure style="text-align:center;">
+            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
+              DROID Rollout #1
+            </figcaption>
+            <video
+              controls
+              autoplay
+              muted
+              loop
+              width="600"
+              style="max-width:100%; height:auto;"
+              src="./static/videos/droid/droid_1.mp4"
+            ></video>
+            <figcaption class="droid-prompt">
+              Prompt: "A silver toaster sits on a table with a red and black checkered tablecloth. A robot arm pushes down the lever on the toaster."
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            DROID Rollout #2
+          </div>
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="600"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/droid/droid_2.mp4"
+                ></video>
+                <figcaption class="droid-prompt">
+                  Prompt: "A white robot arm moves down and grasps a white tea towel on a white table, then moves the tea towel to wipe the table surface."
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            DROID Rollout #3
+          </div>
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="600"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/droid/droid_3.mp4"
+                ></video>
+                <figcaption class="droid-prompt">
+                  Prompt: "A robot arm descends and picks up the lid from a black pot on a kitchen counter and then sets the lid down on the counter next to the pot."
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            DROID Rollout #4
+          </div>
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="600"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/droid/droid_4.mp4"
+                ></video>
+                <figcaption class="droid-prompt">
+                  Prompt: "A white robot arm approaches a table with a red pepper, a silver salt shaker, and a yellow corn plush. The arm's gripper picks up the corn plush and moves it to the left on the table. The camera remains stationary."
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-container">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            DROID Rollout #5
+          </div>
+          <div class="toggle-content">
+            <div style="text-align: center; margin-top: 28px">
+              <figure style="text-align:center;">
+                <video
+                  controls
+                  autoplay
+                  muted
+                  loop
+                  width="600"
+                  style="max-width:100%; height:auto;"
+                  src="./static/videos/droid/droid_5.mp4"
+                ></video>
+                <figcaption class="droid-prompt">
+                  Prompt: "A robot arm moves a folded gray towel to the right on a brown desk."
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 
 
 <section class="section" id="BibTeX">
@@ -793,10 +945,10 @@
   <div class="container">
     <div class="content has-text-centered">
       <a class="icon-link"
-         href="TODO" target="_blank" class="external-link">
+         href="static/pdf/eqf.pdf" target="_blank" class="external-link">
          <i class="fas fa-file-pdf"></i>
       </a>
-      <a class="icon-link" href="TODO" target="_blank" class="external-link" disabled>
+      <a class="icon-link" href="#" class="external-link" disabled>
         <i class="fab fa-github"></i>
       </a>
     </div>
@@ -805,9 +957,10 @@
     </div>
     <div class="columns is-centered">
       <div class="column is-8">
-        <div class="content">
+        <div class="content has-text-centered resource-links footer-attribution">
           <p>
-            This website is based on the <a href="https://github.com/nerfies/nerfies.github.io">open source website code</a> from the Nerfies website.
+            This website is based on the open source website code from the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> and 
+            <a href="https://flowequivariantworldmodels.github.io">Flow Equivariant World Models</a> websites.
           </p>
         </div>
       </div>

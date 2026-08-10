@@ -77,23 +77,51 @@ body {
   margin-left: 0.2em;  /* space between logo and text */
 }
 
+.affil-logo-medium {
+  height: 2.25em;           /* medium height */
+  width: auto;
+  vertical-align: -0.7em; /* nudges it down a bit to align */
+  margin-right: 0.1em;  /* space between logo and text */
+  margin-left: 0.2em;  /* space between logo and text */
+}
+
 .affil-logo-spaced {
   margin-left: 0.8em;
 }
 
 
+.publication-hero .hero-body {
+  padding-bottom: 0.75rem;
+}
+
 .teaser .hero-body {
   padding-top: 0;
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
 }
 
 .teaser {
   font-family: 'Google Sans', sans-serif;
 }
 
+.teaser .subtitle {
+  margin-bottom: 0;
+}
+
+.section.release-video-section {
+  padding-top: 0.5rem;
+}
+
 .section {
   padding-top: 1rem;
   padding-bottom: 1rem;
+}
+
+.droid-prompt {
+  max-width: 600px;
+  margin: 0.5rem auto 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 
