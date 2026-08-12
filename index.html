@@ -255,7 +255,7 @@
 
     .equation-box {
       margin: 18px 0;
-      padding: 18px 22px;
+      padding: 2px 12px;
       background: #f3f7fb;
       border: 1px solid #cddeed;
       border-radius: 12px;
@@ -410,7 +410,7 @@
           <div class="is-size-5 publication-authors">
             <span class="author-block">
               <img
-                src="./static/images/ucsd.jpg"
+                src="./static/images/ucsd.png"
                 alt="UCSD logo"
                 class="affil-logo"
               />
@@ -430,7 +430,7 @@
 
             <span class="author-block">
               <img
-                src="./static/images/harvard.jpg"
+                src="./static/images/harvard.png"
                 alt="Harvard logo"
                 class="affil-logo-medium affil-logo-spaced"
               />
@@ -559,7 +559,7 @@
 <hr class="section-divider">
 
 <!-- ================================================================== -->
-<!-- 1. TRAINING & INFERENCE: FLOW MATCHING VS. EQF                    -->
+<!-- 1. TRAINING & INFERENCE: FLOW MATCHING VS. EqF                    -->
 <!-- ================================================================== -->
 
 <section class="section" id="fm-vs-eqf">
@@ -581,7 +581,7 @@
           \[
           \mathbf{x}^{\boldsymbol{\sigma}}
           =
-          (1- \boldsymbol{\sigma})\odot\mathbf{x}
+          (\boldsymbol{1}- \boldsymbol{\sigma})\odot\mathbf{x}
           +
           \boldsymbol{\sigma}\odot\boldsymbol{\epsilon},
           \qquad
@@ -602,7 +602,7 @@
                 \]
               </div>
 
-              <div class="content has-text-justified">
+              <div class="content has-text-centered">
                 <p>
                   Flow Matching receives both the noisy sample and a matched noise level. During inference, 
                   the sampler follows a prescribed sequence of noise levels to produce a sample from the 
@@ -622,18 +622,18 @@
 
               <div class="equation-box">
                 \[
-                f_{\mathrm{EQF}}(\mathbf{x}^{\boldsymbol{\sigma}})
+                f_{\mathrm{EqF}}(\mathbf{x}^{\boldsymbol{\sigma}})
                 \rightarrow \mathbf{v}
                 \]
               </div>
 
-              <div class="content has-text-justified">
+              <div class="content has-text-centered">
                 <p>
-                  Instead of learning a chain of noise-conditional velocity fields, EqF learns a single
-                  denoising field over noisy samples, regardless of their noise level.
+                  Instead of learning a chain of noise-conditional velocity fields, <b>EqF</b> learns a single
+                  denoising field over noisy samples, without explicit noise level conditioning.
                 </p>
                 <!-- <p>
-                  EqF does this by learning an internal estimator of the sample's true noise level, which can also 
+                  <b>EqF</b> does this by learning an internal estimator of the sample's true noise level, which can also 
                   be seen as a proxy for the distance to the data manifold. Without 
                   restrictive noise level conditioning, this internal estimate can be used to shape the sampling dynamics
                   at inference time to have adaptive properties!
@@ -654,7 +654,7 @@
         </figure>
 
         <div class="takeaway-box">
-          To learn the correct denoising field, EqF naturally learns an internal estimator of the noise level, which is also
+          To learn the correct denoising field, <b>EqF</b> naturally learns an internal estimator of the noise level, which is also
           a proxy for the distance to the data manifold. This internal estimate can be used to shape the sampling dynamics
           at inference time to have adaptive properties! Meanwhile, Flow Matching's rigid and inaccurate noise level conditioning 
           produces incorrect denoising directions, especially in autoregressive video generation rollouts.
@@ -678,11 +678,12 @@
     <div class="columns is-centered">
       <div class="column is-full-width">
 
-        <h2 class="title is-3 has-text-centered">Modular Inference with EqF</h2>
+        <h2 class="title is-3 has-text-centered">Modular Training and Inference Decisions with EqF</h2>
 
         <div class="content has-text-justified section-intro">
           <p>
-            EqF separates the training of the denoising field from the shaping of the sampling dynamics.
+            <b>EqF</b> separates the training of the denoising field from the shaping of the sampling dynamics.
+            This is done by leveraging information that the model already learned as part of its training:
           </p>
         </div>
 
@@ -691,20 +692,20 @@
           <div class="column">
             <div class="concept-card">
               <h3 class="title is-4 has-text-centered">Estimate Sampling Progress</h3>
-              <div class="content has-text-justified">
+              <div class="content has-text-centered">
                 <p>
                   A lightweight readout model \(h_\omega\) easily learns to predict the current noise level from the 
-                  intermediate EqF activations \(z\) as EqF already has an internal estimate. This provides
-                  feedback about hwo far the current sample has progressed toward clean data.
+                  intermediate <b>EqF</b> activations \(\mathbf{z}\) as <b>EqF</b> already has an internal estimate. This provides
+                  feedback about how far the current sample has progressed toward clean data.
                 </p>
               </div>
 
               <div class="equation-box">
                 \[
                 \begin{aligned}
-                (\hat{\mathbf{v}}^{(i)},z^{(i)})
-                &= f_{\mathrm{EQF}}(\mathbf{x}^{(i)}),\\
-                \hat{\sigma}^{(i)}&=h_\omega(z^{(i)}).
+                (\widehat{\mathbf{v}}^{(i)},\mathbf{z}^{(i)})
+                &= f_{\mathrm{EqF}}(\mathbf{x}^{(i)}),\\
+                \widehat{\boldsymbol{\sigma}}^{(i)}&=h_\omega(\mathbf{z}^{(i)}).
                 \end{aligned}
                 \]
               </div>
@@ -713,12 +714,13 @@
 
           <div class="column">
             <div class="concept-card">
-              <h3 class="title is-4 has-text-centered">Shape the Sampling Dynamics</h3>
-              <div class="content has-text-justified">
+              <h3 class="title is-4 has-text-centered">Shape Sampling Dynamics</h3>
+              <div class="content has-text-centered">
                 <p>
                   An inference-time warp \(\eta\) maps the estimated noise level to an update magnitude.
                   Different choices of \(\eta\) can induce different sampling landscapes, introduced
-                  in the next section.
+                  in the next section. Shown below is an attractor warp function that makes the sampling
+                  converge to a fixed point.
                 </p>
               </div>
 
@@ -728,7 +730,7 @@
                 =
                 \mathbf{x}^{(i)}
                 -
-                \eta(\hat{\sigma}^{(i)})
+                \eta(\widehat{\boldsymbol{\sigma}}^{(i)})
                 \odot
                 \hat{\mathbf{v}}^{(i)}.
                 \]
@@ -749,7 +751,7 @@
 
 
         <div class="takeaway-box">
-          The same trained EqF model can support flexible inference procedures without changing the training objective.
+          The same trained <b>EqF</b> model can support flexible inference procedures without changing the training objective.
           For example, a transport-style warp can intersect the data manifold with a nonzero velocity, while an attractor-style
           warp makes the update magnitude vanish near clean data.
         </div>
@@ -758,10 +760,10 @@
           <h3 class="title is-4">Relation to Equilibrium Matching</h3>
           <div class="content has-text-justified">
             <p>
-              Equilibrium Matching (EqM) also removes explicit noise conditioning, but it modifies the
+              Equilibrium Matching (EqM) proposes to remove noise conditioning for image generation, but it modifies the
               training target to \(c(\sigma) \cdot \mathbf{v}\) so that the learned field has baked in attractor-like sampling dynamics.
               This introduces costly training-time hyperparameters for the shape of \(c\) and its magnitude scale. 
-              By moving the sampling dynamics to an inference-time decision, we demonstrate that EqF with the warp can recover
+              By moving the sampling dynamics to an inference-time decision, we demonstrate that <b>EqF</b> with the warp can recover
               any trained EqM function without having to retrain. Additionally, we find that EqM's objective induces a suboptimal
               loss weighting; see the paper for more details.
             </p>
@@ -790,19 +792,19 @@
 
         <div class="content has-text-justified section-intro">
           <p>
-            EqF's framework enables inference procedures with natural feedback mechanisms to adjust
+            <b>EqF</b>'s framework enables inference procedures with natural feedback mechanisms to adjust
             to the state of the sample. We use this flexibility in three complimentary ways: 
           </p>
         </div>
 
-        <div class="columns is-variable is-4" style="margin-top: 30px;">
+        <div class="columns is-variable is-4 is-multiline" style="margin-top: 30px;">
 
-          <div class="column">
+          <div class="column is-full">
             <div class="concept-card adaptive-card">
               <h4 class="title is-5">Closed-Loop Feedback</h4>
               <div class="content has-text-justified">
                 <p>
-                  EqF estimates the current state of the sample via the noise level
+                  <b>EqF</b> estimates the current state of the sample via the noise level
                   estimate, rather than following a predetermined trajectory. The warp adjusts using this noise level 
                   estimate to adapt to progress that is faster or slower than expected.
                 </p>
@@ -810,7 +812,7 @@
             </div>
           </div>
 
-          <div class="column">
+          <div class="column is-full">
             <div class="concept-card adaptive-card">
               <h4 class="title is-5">Attractor Sampling + NAG</h4>
               <div class="content has-text-justified">
@@ -822,7 +824,7 @@
             </div>
           </div>
 
-          <div class="column">
+          <div class="column is-full">
             <div class="concept-card adaptive-card">
               <h4 class="title is-5">Budget-Adaptive Sampling</h4>
               <div class="content has-text-justified">
@@ -849,7 +851,8 @@
         <div class="takeaway-box">
           The model uses feedback from the current sample to accelerate toward a fixed point, and dynamically 
           redistribute the sampling dynamics under a limited inference budget. These capabilities, uniquely 
-          enabled by EqF's framework, produce gains across Minecraft, Re10K, and Droid datasets. 
+          enabled by <b>EqF</b>'s framework, produce gains across Minecraft, Re10K, and Droid datasets, as described
+          in the following section.
         </div>
 
       </div>
@@ -862,128 +865,38 @@
 
 
 <!-- ================================================================== -->
-<!-- 4. ANALYSIS: NOISE-LEVEL DIVERGENCE                                -->
+<!-- 4. VIDEO GENERATION EXPERIMENTS                                    -->
 <!-- ================================================================== -->
-
-<section class="section" id="noise-level-analysis">
+<section class="section" id="video-generation-experiments">
   <div class="container is-max-desktop">
+
     <div class="columns is-centered">
       <div class="column is-full-width">
-
-        <h2 class="title is-3 has-text-centered">Analysis: Why Is Fixed Noise Conditioning an Issue?</h2>
+        <h2 class="title is-3 has-text-centered">Video Generation Experiments</h2>
 
         <div class="content has-text-justified section-intro">
           <p>
-            Flow Matching inference assumes that the scheduled noise level accurately describes the current
-            state of the generated sample. During training, Flow Matching always receives the exact pair of 
-            a noisy sample and the exact noise level that the sample is at. During autoregressive generation,
-            However, this assumption does not hold in practice, as the forward and reverse processes are not 
-            the same. Furthermore, integration and generation errors over autoregressive rollouts make this
-            assumption even less sturdy. 
+            We train and evaluate <b>EqF</b> across three video generation settings: action-conditioned Minecraft,
+            camera-conditioned RealEstate10K, and language prompt-conditioned robotic manipulation on Droid. 
+            The Minecraft model is trained from scratch, with all baselines trained under matched budgets. 
+            Re10K models are finetuned from open source Flow Matching model Wan 2.1 with 1.3B params,
+            a process we term Equilibrium Finetuning. Droid is trained at an even larger scale at 5B params. 
           </p>
           <p>
-            We probe this with an auxiliary model trained to estimate the effective noise level of the current sample
-            and compare it with the scheduled noise level. Indeed, we find that 
-            the scheduled and true noise levels has a nonzero divergence that increases over autoregressive rollouts (left). 
-            We posit that this is a primary cause for the degrading performance of Flow Matching for long rollouts (right). 
-            An attempt to close the loop by passing in the estimated noise level can help bridge the gap, but it still is unable
-            to match EqF's performance. 
+            These results demonstrate the scalability and broad applicability of <b>EqF</b>'s framework.
+            Results are visualized below, with more experimental details and results in the paper.
           </p>
         </div>
 
-        <figure style="text-align:center; margin:28px auto;">
-          <img
-            src="./static/images/figure3.png"
-            alt="Noise-level divergence and autoregressive generation quality"
-            width="900"
-            style="max-width:100%; height:auto;"
-          />
-        </figure>
-
-        <div class="takeaway-box">
-          Since Flow Matching is trained to predict the denoising direction given a noise level that it assumes is correct,
-          it is unable to adapt during inference time when the two signals have a mismatch. This mismatch
-          is a contributing factor to Flow Matching's performance degradation over autoregressive video 
-          generation rollouts. See the paper for further analysis.
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<hr class="section-divider">
-
-
-<!-- ================================================================== -->
-<!-- 5. ANALYSIS: WHY NOISE-UNCONDITIONAL DENOISING WORKS               -->
-<!-- ================================================================== -->
-
-<section class="section" id="noise-unconditional-analysis">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-
-        <h2 class="title is-3 has-text-centered">Analysis: How EqF Learns Without Noise Conditioning</h2>
-
-        <div class="content has-text-justified section-intro">
-          <p>
-            Removing \(\sigma\) initially appears to make the denoising task ambiguous. Flow Matching explicitly
-            receives the noise level, while EqF must infer the appropriate denoising direction from the noisy
-            sample alone.
-          </p>
-          <p>
-            However, for high dimensional data, the posterior \(p(\sigma\mid\mathbf{x}_{\sigma})\) concentrates
-            around a single noise level. The noisy sample therefore contains enough information to identify
-            its own effective noise level, enabling EqF to actually learn the same optimal denoising field
-            as Flow Matching, which gets the noise level information directly.
-          </p>
-          <p>
-            We find that in practice across datasets, this decomposition holds: EqF learns the same denoising field
-            as Flow Matching, and it does so by having an internal estimate of the noise level. Together, these
-            render the explicit noise level conditioning superfluous.
-          </p>
-        </div>
-
-        <figure style="text-align:center; margin:28px auto;">
-          <img
-            src="./static/images/figure10.png"
-            alt="Flow Matching and Equilibrium Forcing loss difference and residual field gap"
-            width="900"
-            style="max-width:50%; height:auto;"
-          />
-        </figure>
-
-        <div class="takeaway-box">
-          The residual between the Bayes-optimal EqF and Flow Matching losses vanishes across
-          training, as predicted by our analysis. Together, this provides an explanation for how noise-unconditional
-          denoising models can improve over noise-conditional ones: the underlying optimal denoising fields are equally
-          optimal, but EqF can avoid incorrect noise level conditioning altogether, and it can further take advantage
-          of adaptive algorithms.
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<hr class="section-divider">
-
-
-<section class="section" id="results-minecraft">
-  <div class="container is-max-desktop">
-
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">Minecraft Results</h2>
+        <!-- 4A. MINECRAFT ROLLOUTS -->
+        <div class="video-subsection" id="results-minecraft">
+        <h3 class="title is-4 has-text-centered">Minecraft Rollouts</h3>
 
         <div class="content has-text-justified">
           <p>
-              For better visualization, we provide example videos of full rollouts on the Minecraft dataset. We compare between 
-              Equilibrium Forcing (EqF), baseline Equilibrium Matching (EqM), and baseline Flow Matching (FM). Each rollout follows 
-              a set of action conditions either turning left, turning right, or going straight. Rollouts are conditioned on 25 
-              frames of history, and generate 275 frames into the future with a model self-attention window size of 50. 
+            We compare the generated <b>EqF</b> videos with Equilibrium Matching (EqM) and FM baselines on the Minecraft dataset. Each rollout follows
+            a set of action conditions either going left, right, or straight. Rollouts are conditioned on 25 
+            frames of history, and generate 275 frames into the future with a model self-attention window size of 50. 
           </p>
         </div>
 
@@ -1006,6 +919,12 @@
           </figure>
         </div>
 
+        <div class="toggle-container additional-rollouts">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            Additional Minecraft Rollouts
+          </div>
+          <div class="toggle-content">
         <div class="toggle-container">
           <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
             <span class="arrow">▶</span>
@@ -1109,28 +1028,21 @@
         </div>
       </div>
     </div>
+          </div>
+        </div>
+        </div>
 
-</section>
+        <hr class="video-subsection-divider">
 
-
-
-<hr class="section-divider">
-
-
-
-<section class="section" id="results-re10k">
-  <div class="container is-max-desktop">
-
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">RealEstate10K Results</h2>
+        <!-- 4B. REALESTATE10K ROLLOUTS -->
+        <div class="video-subsection" id="results-re10k">
+        <h3 class="title is-4 has-text-centered">RealEstate10K Rollouts</h3>
 
         <div class="content has-text-justified">
           <p>
-              We also provide example videos of full rollouts on the RealEstate10K dataset. We compare between the finetuned EqF-FT 
-              and FM-FT models, finetuned from the pretrained Wan 2.1 Text to video 1.3B parameter video generation model. Each rollout
-              follows camera conditions to describe the movement of the camera throughout the trajectory. Rollouts are conditioned on 37
-              frames of history, and generate 152 frames into the future with a model self-attention window size of 49. 
+            We compare videos of rollouts on RealEstate10K between the finetuned <b>EqF-FT</b> and FM-FT models. Each rollout follows 
+            camera conditions that describe the movement of the camera throughout the trajectory. Rollouts are conditioned on 
+            37 frames of history, and generate 152 frames into the future with a model self-attention window size of 49. 
           </p>
         </div>
 
@@ -1146,13 +1058,19 @@
               autoplay
               muted
               loop
-              width="600"
+              width="500"
               style="max-width:100%; height:auto;"
               src="./static/videos/re10k/re10k_1.mp4"
             ></video>
           </figure>
         </div>
 
+        <div class="toggle-container additional-rollouts">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            Additional RealEstate10K Rollouts
+          </div>
+          <div class="toggle-content">
         <div class="toggle-container">
           <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
             <span class="arrow">▶</span>
@@ -1170,7 +1088,7 @@
                   autoplay
                   muted
                   loop
-                  width="600"
+                  width="500"
                   style="max-width:100%; height:auto;"
                   src="./static/videos/re10k/re10k_2.mp4"
                 ></video>
@@ -1196,7 +1114,7 @@
                   autoplay
                   muted
                   loop
-                  width="600"
+                  width="500"
                   style="max-width:100%; height:auto;"
                   src="./static/videos/re10k/re10k_3.mp4"
                 ></video>
@@ -1222,7 +1140,7 @@
                 autoplay
                 muted
                 loop
-                width="600"
+                width="500"
                 style="max-width:100%; height:auto;"
                 src="./static/videos/re10k/re10k_4.mp4"
               ></video>
@@ -1248,7 +1166,7 @@
               autoplay
               muted
               loop
-              width="600"
+              width="500"
               style="max-width:100%; height:auto;"
               src="./static/videos/re10k/re10k_5.mp4"
             ></video>
@@ -1256,22 +1174,20 @@
         </div>
       </div>
     </div>
+          </div>
+        </div>
+        </div>
 
-</section>
+        <hr class="video-subsection-divider">
 
-
-<hr class="section-divider">
-
-
-<section class="section" id="results-droid">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">DROID Results</h2>
+        <!-- 4C. DROID ROLLOUTS -->
+        <div class="video-subsection" id="results-droid">
+        <h3 class="title is-4 has-text-centered">DROID Rollouts</h3>
 
         <div class="content has-text-justified">
           <p>
-            We also provide example videos of full rollouts on the DROID dataset.
+            We also provide example videos of <b>EqF-FT</b>'s rollouts on the Droid dataset, with the text prompt below the video.
+            These videos are non-autoregressively generated, generated from 21 frames of context to generate 28 future frames.
           </p>
         </div>
 
@@ -1285,7 +1201,7 @@
               autoplay
               muted
               loop
-              width="600"
+              width="450"
               style="max-width:100%; height:auto;"
               src="./static/videos/droid/droid_1.mp4"
             ></video>
@@ -1295,6 +1211,12 @@
           </figure>
         </div>
 
+        <div class="toggle-container additional-rollouts">
+          <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
+            <span class="arrow">▶</span>
+            Additional DROID Rollouts
+          </div>
+          <div class="toggle-content">
         <div class="toggle-container">
           <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
             <span class="arrow">▶</span>
@@ -1308,7 +1230,7 @@
                   autoplay
                   muted
                   loop
-                  width="600"
+                  width="450"
                   style="max-width:100%; height:auto;"
                   src="./static/videos/droid/droid_2.mp4"
                 ></video>
@@ -1333,7 +1255,7 @@
                   autoplay
                   muted
                   loop
-                  width="600"
+                  width="450"
                   style="max-width:100%; height:auto;"
                   src="./static/videos/droid/droid_3.mp4"
                 ></video>
@@ -1358,7 +1280,7 @@
                   autoplay
                   muted
                   loop
-                  width="600"
+                  width="450"
                   style="max-width:100%; height:auto;"
                   src="./static/videos/droid/droid_4.mp4"
                 ></video>
@@ -1383,7 +1305,7 @@
                   autoplay
                   muted
                   loop
-                  width="600"
+                  width="450"
                   style="max-width:100%; height:auto;"
                   src="./static/videos/droid/droid_5.mp4"
                 ></video>
@@ -1394,12 +1316,128 @@
             </div>
           </div>
         </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+
+
+
+<hr class="section-divider">
+
+
+<!-- ================================================================== -->
+<!-- 5. ANALYSIS: NOISE-LEVEL DIVERGENCE                                -->
+<!-- ================================================================== -->
+
+<section class="section" id="noise-level-analysis">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+
+        <h2 class="title is-3 has-text-centered">Analysis: Why Is Fixed Noise Conditioning an Issue?</h2>
+
+        <div class="content has-text-justified section-intro">
+          <p>
+            Flow Matching inference assumes that the scheduled noise level accurately describes the current
+            state of the generated sample. During training, Flow Matching always receives the exact pair of 
+            a noisy sample and the exact noise level that the sample is at. During autoregressive generation,
+            However, this assumption does not hold in practice, as the forward and reverse processes are not 
+            the same. Furthermore, integration and generation errors over autoregressive rollouts make this
+            assumption even less sturdy. 
+          </p>
+          <p>
+            We probe this with an auxiliary model trained to estimate the effective noise level of the current sample
+            and compare it with the scheduled noise level. Indeed, we find that 
+            the scheduled and true noise levels has a nonzero divergence that increases over autoregressive rollouts (left). 
+            We posit that this is a primary cause for the degrading performance of Flow Matching for long rollouts (right). 
+            An attempt to close the loop by passing in the estimated noise level can help bridge the gap, but it still is unable
+            to match <b>EqF</b>'s performance. 
+          </p>
+        </div>
+
+        <figure style="text-align:center; margin:28px auto;">
+          <img
+            src="./static/images/figure3.png"
+            alt="Noise-level divergence and autoregressive generation quality"
+            width="900"
+            style="max-width:100%; height:auto;"
+          />
+        </figure>
+
+        <div class="takeaway-box">
+          Since Flow Matching is trained to predict the denoising direction given a noise level that it assumes is correct,
+          it is unable to adapt during inference time when the two signals have a mismatch. This mismatch
+          is a contributing factor to Flow Matching's performance degradation over autoregressive video 
+          generation rollouts. See the paper for further analysis.
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 
+<hr class="section-divider">
+
+
+<!-- ================================================================== -->
+<!-- 6. ANALYSIS: WHY NOISE-UNCONDITIONAL DENOISING WORKS               -->
+<!-- ================================================================== -->
+
+<section class="section" id="noise-unconditional-analysis">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+
+        <h2 class="title is-3 has-text-centered">Analysis: How <b>EqF</b> Learns Without Noise Conditioning</h2>
+
+        <div class="content has-text-justified section-intro">
+          <p>
+            Removing \(\sigma\) initially appears to make the denoising task ambiguous. Flow Matching explicitly
+            receives the noise level, while <b>EqF</b> must infer the appropriate denoising direction from the noisy
+            sample alone.
+          </p>
+          <p>
+            However, for high dimensional data, the posterior \(p(\sigma\mid\mathbf{x}_{\sigma})\) concentrates
+            around a single noise level. The noisy sample therefore contains enough information to identify
+            its own effective noise level, enabling <b>EqF</b> to actually learn the same optimal denoising field
+            as Flow Matching, which gets the noise level information directly.
+          </p>
+          <p>
+            We find that in practice across datasets, this decomposition holds: <b>EqF</b> learns the same denoising field
+            as Flow Matching, and it does so by having an internal estimate of the noise level. Together, these
+            render the explicit noise level conditioning superfluous.
+          </p>
+        </div>
+
+        <figure style="text-align:center; margin:28px auto;">
+          <img
+            src="./static/images/figure10.png"
+            alt="Flow Matching and Equilibrium Forcing loss difference and residual field gap"
+            width="900"
+            style="max-width:50%; height:auto;"
+          />
+        </figure>
+
+        <div class="takeaway-box">
+          The residual between the Bayes-optimal <b>EqF</b> and Flow Matching losses vanishes across
+          training, as predicted by our analysis. Together, this provides an explanation for how noise-unconditional
+          denoising models can improve over noise-conditional ones: the underlying optimal denoising fields are equally
+          optimal, but <b>EqF</b> can avoid incorrect noise level conditioning altogether, and it can further take advantage
+          of adaptive algorithms.
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<hr class="section-divider">
 
 
 <section class="section" id="BibTeX">
