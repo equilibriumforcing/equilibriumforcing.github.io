@@ -236,7 +236,106 @@
     .toggle-container.open > .toggle-header .arrow {
       transform: rotate(90deg);
     }
+
+        /* ------------------------------------------------------------------ */
+    /* Main paper explanation sections                                   */
+    /* ------------------------------------------------------------------ */
+
+    .method-card {
+      height: 100%;
+      padding: 24px;
+      background: #fafcff;
+      border: 1px solid #d8e4ef;
+      border-radius: 14px;
+    }
+
+    .method-card h3 {
+      margin-bottom: 12px !important;
+    }
+
+    .equation-box {
+      margin: 18px 0;
+      padding: 18px 22px;
+      background: #f3f7fb;
+      border: 1px solid #cddeed;
+      border-radius: 12px;
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .concept-card {
+      height: 100%;
+      padding: 20px;
+      background: #fafcff;
+      border: 1px solid #d8e4ef;
+      border-radius: 12px;
+    }
+
+    .concept-card h4 {
+      color: #1f4e79;
+      margin-bottom: 10px !important;
+    }
+
+    .takeaway-box {
+      margin: 28px auto;
+      padding: 20px 24px;
+      max-width: 850px;
+      background: #f3f7fb;
+      border-left: 4px solid #1f4e79;
+      border-radius: 8px;
+      font-size: 1.08rem;
+    }
+
+    .figure-placeholder {
+      margin: 28px auto;
+      padding: 55px 25px;
+      max-width: 900px;
+      border: 2px dashed #a9c4dd;
+      border-radius: 14px;
+      background: #fafcff;
+      color: #6b7f92;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .comparison-label {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1f4e79;
+      margin-bottom: 12px;
+    }
+
+    .section-intro {
+      max-width: 850px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .big-takeaway {
+      margin: 40px auto 10px auto;
+      text-align: center;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1f4e79;
+    }
+
   </style>
+
+
+  <!-- MathJax for equations -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script
+    id="MathJax-script"
+    async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 
 
 </head>
@@ -459,51 +558,420 @@
 
 <hr class="section-divider">
 
+<!-- ================================================================== -->
+<!-- 1. TRAINING & INFERENCE: FLOW MATCHING VS. EQF                    -->
+<!-- ================================================================== -->
 
-<!-- <section class="section" id="model-3d">
+<section class="section" id="fm-vs-eqf">
   <div class="container is-max-desktop">
-
     <div class="columns is-centered">
       <div class="column is-full-width">
-        <h2 class="title is-3"></h2>
 
-        
-        <h3 class="title is-4"></h3>
-        <div class="content has-text-justified">
+        <h2 class="title is-3 has-text-centered">Equilibrium Forcing Overview</h2>
+
+        <div class="content has-text-justified section-intro">
           <p>
-        
+            Equilibrium Forcing (<b>EqF</b>) learns a denoising field for generating video samples without 
+            explicit noise level conditioning. Similar to Flow Matching, noisy training data is constructed from 
+            a simple interpolation with the corresponding velocity target:
           </p>
         </div>
 
-        <div class="col-auto">
-          <br>
-        <div style="text-align: center;"><img src='./static/images/comparison.png' style="max-width: 100%; height: auto;" width="900" alt='missing' /></div>
+        <div class="equation-box" style="max-width: 760px; margin-left:auto; margin-right:auto;">
+          \[
+          \mathbf{x}^{\boldsymbol{\sigma}}
+          =
+          (1- \boldsymbol{\sigma})\odot\mathbf{x}
+          +
+          \boldsymbol{\sigma}\odot\boldsymbol{\epsilon},
+          \qquad
+          \mathbf{v}=\boldsymbol{\epsilon}-\mathbf{x}.
+          \]
         </div>
 
-        <br>
-        
-        <h3 class="title is-4"></h3>
-        <div class="content has-text-justified">
-          <p>
-          </p>
+        <div class="columns is-variable is-5" style="margin-top: 30px;">
+
+          <div class="column">
+            <div class="method-card">
+              <h3 class="title is-4 has-text-centered">Flow Matching</h3>
+
+              <div class="equation-box">
+                \[
+                f_{\mathrm{FM}}(\mathbf{x}^{\boldsymbol{\sigma}},\boldsymbol{\sigma})
+                \rightarrow \mathbf{v}
+                \]
+              </div>
+
+              <div class="content has-text-justified">
+                <p>
+                  Flow Matching receives both the noisy sample and a matched noise level. During inference, 
+                  the sampler follows a prescribed sequence of noise levels to produce a sample from the 
+                  target distribution.
+                </p>
+                <!-- <p>
+                  Inaccurate and rigid noise level conditioning contributes to 
+                  error accumulation, especially for autoregressive video generation.
+                </p> -->
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="method-card">
+              <h3 class="title is-4 has-text-centered">Equilibrium Forcing</h3>
+
+              <div class="equation-box">
+                \[
+                f_{\mathrm{EQF}}(\mathbf{x}^{\boldsymbol{\sigma}})
+                \rightarrow \mathbf{v}
+                \]
+              </div>
+
+              <div class="content has-text-justified">
+                <p>
+                  Instead of learning a chain of noise-conditional velocity fields, EqF learns a single
+                  denoising field over noisy samples, regardless of their noise level.
+                </p>
+                <!-- <p>
+                  EqF does this by learning an internal estimator of the sample's true noise level, which can also 
+                  be seen as a proxy for the distance to the data manifold. Without 
+                  restrictive noise level conditioning, this internal estimate can be used to shape the sampling dynamics
+                  at inference time to have adaptive properties!
+                </p> -->
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div class="col-auto">
-          <br>
-        <div style="text-align: center;"><img src='./static/images/model.png' style="max-width: 80%; height: auto;" width="900" alt='missing' /></div>
+        <figure style="text-align:center; margin:28px auto;">
+          <img
+            src="./static/images/figure2.png"
+            alt="Flow Matching vs. Equilibrium Forcing"
+            width="900"
+            style="max-width:100%; height:auto;"
+          />
+        </figure>
+
+        <div class="takeaway-box">
+          To learn the correct denoising field, EqF naturally learns an internal estimator of the noise level, which is also
+          a proxy for the distance to the data manifold. This internal estimate can be used to shape the sampling dynamics
+          at inference time to have adaptive properties! Meanwhile, Flow Matching's rigid and inaccurate noise level conditioning 
+          produces incorrect denoising directions, especially in autoregressive video generation rollouts.
         </div>
 
       </div>
     </div>
-
   </div>
-</section> -->
+</section>
 
 
 <hr class="section-divider">
 
 
-<section class="section" id="results-3d-blockworld">
+<!-- ================================================================== -->
+<!-- 2. MODULAR INFERENCE                                               -->
+<!-- ================================================================== -->
+
+<section class="section" id="modular-inference">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+
+        <h2 class="title is-3 has-text-centered">Modular Inference with EqF</h2>
+
+        <div class="content has-text-justified section-intro">
+          <p>
+            EqF separates the training of the denoising field from the shaping of the sampling dynamics.
+          </p>
+        </div>
+
+        <div class="columns is-variable is-5" style="margin-top: 30px;">
+
+          <div class="column">
+            <div class="concept-card">
+              <h3 class="title is-4 has-text-centered">Estimate Sampling Progress</h3>
+              <div class="content has-text-justified">
+                <p>
+                  A lightweight readout model \(h_\omega\) easily learns to predict the current noise level from the 
+                  intermediate EqF activations \(z\) as EqF already has an internal estimate. This provides
+                  feedback about hwo far the current sample has progressed toward clean data.
+                </p>
+              </div>
+
+              <div class="equation-box">
+                \[
+                \begin{aligned}
+                (\hat{\mathbf{v}}^{(i)},z^{(i)})
+                &= f_{\mathrm{EQF}}(\mathbf{x}^{(i)}),\\
+                \hat{\sigma}^{(i)}&=h_\omega(z^{(i)}).
+                \end{aligned}
+                \]
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="concept-card">
+              <h3 class="title is-4 has-text-centered">Shape the Sampling Dynamics</h3>
+              <div class="content has-text-justified">
+                <p>
+                  An inference-time warp \(\eta\) maps the estimated noise level to an update magnitude.
+                  Different choices of \(\eta\) can induce different sampling landscapes, introduced
+                  in the next section.
+                </p>
+              </div>
+
+              <div class="equation-box">
+                \[
+                \mathbf{x}^{(i+1)}
+                =
+                \mathbf{x}^{(i)}
+                -
+                \eta(\hat{\sigma}^{(i)})
+                \odot
+                \hat{\mathbf{v}}^{(i)}.
+                \]
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <figure style="text-align:center; margin:28px auto;">
+          <img
+            src="./static/images/figure1_final.png"
+            alt="Equilibrium Forcing overview"
+            width="900"
+            style="max-width:100%; height:auto;"
+          />
+        </figure>
+
+
+        <div class="takeaway-box">
+          The same trained EqF model can support flexible inference procedures without changing the training objective.
+          For example, a transport-style warp can intersect the data manifold with a nonzero velocity, while an attractor-style
+          warp makes the update magnitude vanish near clean data.
+        </div>
+
+        <div class="related-work-card">
+          <h3 class="title is-4">Relation to Equilibrium Matching</h3>
+          <div class="content has-text-justified">
+            <p>
+              Equilibrium Matching (EqM) also removes explicit noise conditioning, but it modifies the
+              training target to \(c(\sigma) \cdot \mathbf{v}\) so that the learned field has baked in attractor-like sampling dynamics.
+              This introduces costly training-time hyperparameters for the shape of \(c\) and its magnitude scale. 
+              By moving the sampling dynamics to an inference-time decision, we demonstrate that EqF with the warp can recover
+              any trained EqM function without having to retrain. Additionally, we find that EqM's objective induces a suboptimal
+              loss weighting; see the paper for more details.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<hr class="section-divider">
+
+
+<!-- ================================================================== -->
+<!-- 3. ADAPTIVE INFERENCE                                              -->
+<!-- ================================================================== -->
+
+<section class="section" id="adaptive-inference">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+
+        <h2 class="title is-3 has-text-centered">Adaptive Inference</h2>
+
+        <div class="content has-text-justified section-intro">
+          <p>
+            EqF's framework enables inference procedures with natural feedback mechanisms to adjust
+            to the state of the sample. We use this flexibility in three complimentary ways: 
+          </p>
+        </div>
+
+        <div class="columns is-variable is-4" style="margin-top: 30px;">
+
+          <div class="column">
+            <div class="concept-card adaptive-card">
+              <h4 class="title is-5">Closed-Loop Feedback</h4>
+              <div class="content has-text-justified">
+                <p>
+                  EqF estimates the current state of the sample via the noise level
+                  estimate, rather than following a predetermined trajectory. The warp adjusts using this noise level 
+                  estimate to adapt to progress that is faster or slower than expected.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="concept-card adaptive-card">
+              <h4 class="title is-5">Attractor Sampling + NAG</h4>
+              <div class="content has-text-justified">
+                <p>
+                  Warps with \(\eta(\sigma)\rightarrow 0\) near clean data turns sampling into fixed-point search. 
+                  This enables gradient-based acceleration algorithms such as Nesterov Accelerated Gradient (NAG).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="concept-card adaptive-card">
+              <h4 class="title is-5">Budget-Adaptive Sampling</h4>
+              <div class="content has-text-justified">
+                <p>
+                  In addition to the denoising progress, the sampler can use the number of steps remaining to 
+                  continuously reallocate the overall inference budget, rather than committing to a schedule
+                  before generation begins. 
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <figure style="text-align:center; margin:28px auto;">
+          <img
+            src="./static/images/adaptive_budget_eqf_and_fm_final.png"
+            alt="Budget-adaptive sampling results"
+            width="900"
+            style="max-width:100%; height:auto;"
+          />
+        </figure>
+
+        <div class="takeaway-box">
+          The model uses feedback from the current sample to accelerate toward a fixed point, and dynamically 
+          redistribute the sampling dynamics under a limited inference budget. These capabilities, uniquely 
+          enabled by EqF's framework, produce gains across Minecraft, Re10K, and Droid datasets. 
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<hr class="section-divider">
+
+
+<!-- ================================================================== -->
+<!-- 4. ANALYSIS: NOISE-LEVEL DIVERGENCE                                -->
+<!-- ================================================================== -->
+
+<section class="section" id="noise-level-analysis">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+
+        <h2 class="title is-3 has-text-centered">Analysis: Why Is Fixed Noise Conditioning an Issue?</h2>
+
+        <div class="content has-text-justified section-intro">
+          <p>
+            Flow Matching inference assumes that the scheduled noise level accurately describes the current
+            state of the generated sample. During training, Flow Matching always receives the exact pair of 
+            a noisy sample and the exact noise level that the sample is at. During autoregressive generation,
+            However, this assumption does not hold in practice, as the forward and reverse processes are not 
+            the same. Furthermore, integration and generation errors over autoregressive rollouts make this
+            assumption even less sturdy. 
+          </p>
+          <p>
+            We probe this with an auxiliary model trained to estimate the effective noise level of the current sample
+            and compare it with the scheduled noise level. Indeed, we find that 
+            the scheduled and true noise levels has a nonzero divergence that increases over autoregressive rollouts (left). 
+            We posit that this is a primary cause for the degrading performance of Flow Matching for long rollouts (right). 
+            An attempt to close the loop by passing in the estimated noise level can help bridge the gap, but it still is unable
+            to match EqF's performance. 
+          </p>
+        </div>
+
+        <figure style="text-align:center; margin:28px auto;">
+          <img
+            src="./static/images/figure3.png"
+            alt="Noise-level divergence and autoregressive generation quality"
+            width="900"
+            style="max-width:100%; height:auto;"
+          />
+        </figure>
+
+        <div class="takeaway-box">
+          Since Flow Matching is trained to predict the denoising direction given a noise level that it assumes is correct,
+          it is unable to adapt during inference time when the two signals have a mismatch. This mismatch
+          is a contributing factor to Flow Matching's performance degradation over autoregressive video 
+          generation rollouts. See the paper for further analysis.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<hr class="section-divider">
+
+
+<!-- ================================================================== -->
+<!-- 5. ANALYSIS: WHY NOISE-UNCONDITIONAL DENOISING WORKS               -->
+<!-- ================================================================== -->
+
+<section class="section" id="noise-unconditional-analysis">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+
+        <h2 class="title is-3 has-text-centered">Analysis: How EqF Learns Without Noise Conditioning</h2>
+
+        <div class="content has-text-justified section-intro">
+          <p>
+            Removing \(\sigma\) initially appears to make the denoising task ambiguous. Flow Matching explicitly
+            receives the noise level, while EqF must infer the appropriate denoising direction from the noisy
+            sample alone.
+          </p>
+          <p>
+            However, for high dimensional data, the posterior \(p(\sigma\mid\mathbf{x}_{\sigma})\) concentrates
+            around a single noise level. The noisy sample therefore contains enough information to identify
+            its own effective noise level, enabling EqF to actually learn the same optimal denoising field
+            as Flow Matching, which gets the noise level information directly.
+          </p>
+          <p>
+            We find that in practice across datasets, this decomposition holds: EqF learns the same denoising field
+            as Flow Matching, and it does so by having an internal estimate of the noise level. Together, these
+            render the explicit noise level conditioning superfluous.
+          </p>
+        </div>
+
+        <figure style="text-align:center; margin:28px auto;">
+          <img
+            src="./static/images/figure10.png"
+            alt="Flow Matching and Equilibrium Forcing loss difference and residual field gap"
+            width="900"
+            style="max-width:50%; height:auto;"
+          />
+        </figure>
+
+        <div class="takeaway-box">
+          The residual between the Bayes-optimal EqF and Flow Matching losses vanishes across
+          training, as predicted by our analysis. Together, this provides an explanation for how noise-unconditional
+          denoising models can improve over noise-conditional ones: the underlying optimal denoising fields are equally
+          optimal, but EqF can avoid incorrect noise level conditioning altogether, and it can further take advantage
+          of adaptive algorithms.
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<hr class="section-divider">
+
+
+<section class="section" id="results-minecraft">
   <div class="container is-max-desktop">
 
     <div class="columns is-centered">
@@ -650,7 +1118,7 @@
 
 
 
-<section class="section" id="results-3d-blockworld">
+<section class="section" id="results-re10k">
   <div class="container is-max-desktop">
 
     <div class="columns is-centered">
