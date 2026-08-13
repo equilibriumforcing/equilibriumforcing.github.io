@@ -343,6 +343,7 @@
 
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
+    <a class="mobile-navbar-back-to-top" href="#top">Back to Top</a>
     <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
@@ -362,8 +363,33 @@
 
     </div>
 
+    <div class="mobile-section-nav" role="navigation" aria-label="Page contents">
+      <p class="mobile-section-nav-title">Contents</p>
+      <a class="navbar-item" href="#abstract">Abstract</a>
+      <a class="navbar-item" href="#fm-vs-eqf">Equilibrium Forcing Overview</a>
+      <a class="navbar-item" href="#modular-inference">Modular Training and Inference Decisions with EqF</a>
+      <a class="navbar-item" href="#adaptive-inference">Adaptive Fixed-point Inference</a>
+      <a class="navbar-item" href="#video-generation-experiments">Video Generation Experiments</a>
+      <a class="navbar-item" href="#noise-level-analysis">Analysis: Why Is Fixed Noise Conditioning an Issue?</a>
+      <a class="navbar-item" href="#noise-unconditional-analysis">Analysis: How EqF Learns Without Noise Conditioning</a>
+      <a class="navbar-item" href="#BibTeX">BibTeX</a>
+    </div>
+
   </div>
 </nav>
+
+<aside class="section-nav" aria-label="Page contents">
+  <p class="section-nav-title">Contents</p>
+  <a data-section-link href="#abstract">Abstract</a>
+  <a data-section-link href="#fm-vs-eqf">Equilibrium Forcing Overview</a>
+  <a data-section-link href="#modular-inference">Modular Training and Inference Decisions with EqF</a>
+  <a data-section-link href="#adaptive-inference">Adaptive Fixed-point Inference</a>
+  <a data-section-link href="#video-generation-experiments">Video Generation Experiments</a>
+  <a data-section-link href="#noise-level-analysis">Analysis: Why Is Fixed Noise Conditioning an Issue?</a>
+  <a data-section-link href="#noise-unconditional-analysis">Analysis: How EqF Learns Without Noise Conditioning</a>
+  <a data-section-link href="#BibTeX">BibTeX</a>
+  <a class="section-nav-back-to-top" href="#top">Back to Top</a>
+</aside>
 
 
 <section class="hero publication-hero">
@@ -524,7 +550,7 @@
 </section>
 
 
-<section class="section">
+<section class="section" id="abstract">
   <div class="container is-max-desktop">
     <!-- Abstract. -->
     <div class="columns is-centered has-text-centered">
@@ -547,9 +573,6 @@
             to surpass the performance of standard noise level-conditional denoising video methods.
           </p>
         </div>
-        <br>
-        
-
       </div>
     </div>
   </div>
@@ -578,15 +601,29 @@
         </div>
 
         <div class="equation-box" style="max-width: 760px; margin-left:auto; margin-right:auto;">
-          \[
-          \mathbf{x}^{\boldsymbol{\sigma}}
-          =
-          (\boldsymbol{1}- \boldsymbol{\sigma})\odot\mathbf{x}
-          +
-          \boldsymbol{\sigma}\odot\boldsymbol{\epsilon},
-          \qquad
-          \mathbf{v}=\boldsymbol{\epsilon}-\mathbf{x}.
-          \]
+          <div class="desktop-equation-layout">
+            \[
+            \mathbf{x}^{\boldsymbol{\sigma}}
+            =
+            (\boldsymbol{1}- \boldsymbol{\sigma})\odot\mathbf{x}
+            +
+            \boldsymbol{\sigma}\odot\boldsymbol{\epsilon},
+            \qquad
+            \mathbf{v}=\boldsymbol{\epsilon}-\mathbf{x}.
+            \]
+          </div>
+          <div class="mobile-equation-layout">
+            \[
+            \begin{aligned}
+            \mathbf{x}^{\boldsymbol{\sigma}}
+            &=
+            (\boldsymbol{1}- \boldsymbol{\sigma})\odot\mathbf{x}
+            +
+            \boldsymbol{\sigma}\odot\boldsymbol{\epsilon},\\
+            \mathbf{v}&=\boldsymbol{\epsilon}-\mathbf{x}.
+            \end{aligned}
+            \]
+          </div>
         </div>
 
         <div class="columns is-variable is-5" style="margin-top: 30px;">
@@ -761,7 +798,7 @@
           <div class="content has-text-justified">
             <p>
               Equilibrium Matching (EqM) proposes to remove noise conditioning for image generation, but it modifies the
-              training target to \(c(\sigma) \cdot \mathbf{v}\) so that the learned field has baked in attractor-like sampling dynamics.
+              training target to \(c(\boldsymbol{\sigma}) \odot \mathbf{v}\) so that the learned field has baked in attractor-like sampling dynamics.
               This introduces costly training-time hyperparameters for the shape of \(c\) and its magnitude scale. 
               By moving the sampling dynamics to an inference-time decision, we demonstrate that <b>EqF</b> with the warp can recover
               any trained EqM function without having to retrain. Additionally, we find that EqM's objective induces a suboptimal
@@ -788,7 +825,7 @@
     <div class="columns is-centered">
       <div class="column is-full-width">
 
-        <h2 class="title is-3 has-text-centered">Adaptive Inference</h2>
+        <h2 class="title is-3 has-text-centered">Adaptive Fixed-point Inference</h2>
 
         <div class="content has-text-justified section-intro">
           <p>
@@ -1397,12 +1434,12 @@
 
         <div class="content has-text-justified section-intro">
           <p>
-            Removing \(\sigma\) initially appears to make the denoising task ambiguous. Flow Matching explicitly
+            Removing \(\boldsymbol{\sigma}\) initially appears to make the denoising task ambiguous. Flow Matching explicitly
             receives the noise level, while <b>EqF</b> must infer the appropriate denoising direction from the noisy
             sample alone.
           </p>
           <p>
-            However, for high dimensional data, the posterior \(p(\sigma\mid\mathbf{x}_{\sigma})\) concentrates
+            However, for high dimensional data, the posterior \(p(\boldsymbol{\sigma}\mid\mathbf{x}^{\boldsymbol{\sigma}})\) concentrates
             around a single noise level. The noisy sample therefore contains enough information to identify
             its own effective noise level, enabling <b>EqF</b> to actually learn the same optimal denoising field
             as Flow Matching, which gets the noise level information directly.
