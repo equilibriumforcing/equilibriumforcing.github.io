@@ -366,6 +366,7 @@
     <div class="mobile-section-nav" role="navigation" aria-label="Page contents">
       <p class="mobile-section-nav-title">Contents</p>
       <a class="navbar-item" href="#abstract">Abstract</a>
+      <a class="navbar-item" href="#generated-video-samples">Generated Video Samples</a>
       <a class="navbar-item" href="#fm-vs-eqf">Equilibrium Forcing Overview</a>
       <a class="navbar-item" href="#modular-inference">Modular Training and Inference Decisions with EqF</a>
       <a class="navbar-item" href="#adaptive-inference">Adaptive Fixed-point Inference</a>
@@ -381,6 +382,7 @@
 <aside class="section-nav" aria-label="Page contents">
   <p class="section-nav-title">Contents</p>
   <a data-section-link href="#abstract">Abstract</a>
+  <a data-section-link href="#generated-video-samples">Generated Video Samples</a>
   <a data-section-link href="#fm-vs-eqf">Equilibrium Forcing Overview</a>
   <a data-section-link href="#modular-inference">Modular Training and Inference Decisions with EqF</a>
   <a data-section-link href="#adaptive-inference">Adaptive Fixed-point Inference</a>
@@ -575,6 +577,65 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<section class="section" id="generated-video-samples">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Generated Video Samples</h2>
+    <div class="content has-text-centered section-intro">
+      <p>
+        Below are video samples from the Minecraft, RealEstate10K, and DROID datasets.
+        More are visible below in the <a href="#video-generation-experiments">experiments section</a> of this webpage.
+      </p>
+    </div>
+
+    <figure class="featured-video-sample">
+      <figcaption class="featured-video-caption">Minecraft Rollout #1</figcaption>
+      <video
+        controls
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        width="750"
+        src="./static/videos/minecraft/minecraft_1.mp4"
+      ></video>
+    </figure>
+
+    <figure class="featured-video-sample">
+      <figcaption class="featured-video-caption">Re10K Rollout #1</figcaption>
+      <video
+        controls
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        width="500"
+        src="./static/videos/re10k/re10k_1.mp4"
+      ></video>
+    </figure>
+
+    <figure class="featured-video-sample">
+      <figcaption class="featured-video-caption">DROID Rollout #1</figcaption>
+      <video
+        controls
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        width="450"
+        src="./static/videos/droid/droid_1.mp4"
+      ></video>
+      <figcaption class="droid-prompt">
+        Prompt: "A silver toaster sits on a table with a red and black checkered tablecloth. A robot arm pushes down the lever on the toaster."
+      </figcaption>
+    </figure>
   </div>
 </section>
 
@@ -937,25 +998,6 @@
           </p>
         </div>
 
-        <!-- Model comparison. -->
-
-        <div style="text-align: center; margin-top: 28px">
-          <figure style="text-align:center;">
-            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
-              Minecraft Rollout #1
-            </figcaption>
-            <video
-              controls
-              autoplay
-              muted
-              loop
-              width="750"
-              style="max-width:100%; height:auto;"
-              src="./static/videos/minecraft/minecraft_1.mp4"
-            ></video>
-          </figure>
-        </div>
-
         <div class="toggle-container additional-rollouts">
           <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
             <span class="arrow">▶</span>
@@ -1083,25 +1125,6 @@
           </p>
         </div>
 
-        <!-- Model comparison. -->
-
-        <div style="text-align: center; margin-top: 28px">
-          <figure style="text-align:center;">
-            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
-              Re10K Rollout #1
-            </figcaption>
-            <video
-              controls
-              autoplay
-              muted
-              loop
-              width="500"
-              style="max-width:100%; height:auto;"
-              src="./static/videos/re10k/re10k_1.mp4"
-            ></video>
-          </figure>
-        </div>
-
         <div class="toggle-container additional-rollouts">
           <div class="toggle-header" role="button" tabindex="0" aria-expanded="false">
             <span class="arrow">▶</span>
@@ -1226,26 +1249,6 @@
             We also provide example videos of <b>EqF-FT</b>'s rollouts on the Droid dataset, with the text prompt below the video.
             These videos are non-autoregressively generated, generated from 21 frames of context to generate 28 future frames.
           </p>
-        </div>
-
-        <div style="text-align: center; margin-top: 28px">
-          <figure style="text-align:center;">
-            <figcaption style="font-size:20px; font-weight:bold; margin-bottom:8px;">
-              DROID Rollout #1
-            </figcaption>
-            <video
-              controls
-              autoplay
-              muted
-              loop
-              width="450"
-              style="max-width:100%; height:auto;"
-              src="./static/videos/droid/droid_1.mp4"
-            ></video>
-            <figcaption class="droid-prompt">
-              Prompt: "A silver toaster sits on a table with a red and black checkered tablecloth. A robot arm pushes down the lever on the toaster."
-            </figcaption>
-          </figure>
         </div>
 
         <div class="toggle-container additional-rollouts">

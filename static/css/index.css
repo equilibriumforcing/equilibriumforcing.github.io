@@ -313,6 +313,24 @@ body {
   margin-top: 2rem;
 }
 
+.featured-video-sample {
+  margin: 2rem auto 0;
+  text-align: center;
+}
+
+.featured-video-sample video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.featured-video-caption {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
 .video-subsection-divider {
   max-width: 900px;
   margin: 3rem auto;
