@@ -730,12 +730,6 @@
                   Instead of learning a chain of noise-conditional velocity fields, <b>EqF</b> learns a single
                   denoising field over noisy samples, without explicit noise level conditioning.
                 </p>
-                <!-- <p>
-                  <b>EqF</b> does this by learning an internal estimator of the sample's true noise level, which can also 
-                  be seen as a proxy for the distance to the data manifold. Without 
-                  restrictive noise level conditioning, this internal estimate can be used to shape the sampling dynamics
-                  at inference time to have adaptive properties!
-                </p> -->
               </div>
             </div>
           </div>
@@ -754,7 +748,8 @@
         <div class="takeaway-box">
           To learn the correct denoising field, <b>EqF</b> naturally learns an internal estimator of the noise level, which is also
           a proxy for the distance to the data manifold. This internal estimate can be used to shape the sampling dynamics
-          at inference time to have adaptive properties! Meanwhile, Flow Matching's rigid and inaccurate noise level conditioning 
+          at inference time to have adaptive properties! <b>EqF</b>>'s' estimation ability holds for high dimensional data, which we 
+          show empirically across multiple datasets. Meanwhile, Flow Matching's rigid and inaccurate noise level conditioning 
           produces incorrect denoising directions, especially in autoregressive video generation rollouts.
         </div>
 
@@ -927,9 +922,9 @@
               <h4 class="title is-5">Budget-Adaptive Sampling</h4>
               <div class="content has-text-justified">
                 <p>
-                  In addition to the denoising progress, the sampler can use the number of steps remaining to 
-                  continuously reallocate the overall inference budget, rather than committing to a schedule
-                  before generation begins. 
+                  In addition to the denoising progress, the sampler can use the number of steps remaining to iteratively 
+                  reallocate the overall inference budget, rather than committing to an entire step size schedule before 
+                  generation begins.
                 </p>
               </div>
             </div>
@@ -1445,7 +1440,10 @@
             However, for high dimensional data, the posterior \(p(\boldsymbol{\sigma}\mid\mathbf{x}^{\boldsymbol{\sigma}})\) concentrates
             around a single noise level. The noisy sample therefore contains enough information to identify
             its own effective noise level, enabling <b>EqF</b> to actually learn the same optimal denoising field
-            as Flow Matching, which gets the noise level information directly.
+            as Flow Matching, which gets the noise level information directly. 
+            Specifically, with this property, the outer expectation can in effect be removed for Bayes-optimal denoiser for <b>EqF</b>: 
+            \(f^{\star}_\textrm{EqF} (\mathbf{x}^{\boldsymbol{\sigma}}) = \mathbb{E}_{\boldsymbol{\sigma}} 
+            [ \mathbb{E}_{\mathbf{x},\boldsymbol{\epsilon}} [\mathbf{v} \vert \mathbf{x}^{\boldsymbol{\sigma}}, \boldsymbol{\sigma}] \vert \mathbf{x}^{\boldsymbol{\sigma}} ]. \)
           </p>
           <p>
             We find that in practice across datasets, this decomposition holds: <b>EqF</b> learns the same denoising field
